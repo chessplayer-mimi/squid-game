@@ -1,70 +1,76 @@
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魷魚遊戲 - 數位版玻璃橋遊戲</title>
+    <script>
+        function startGame() {
+            let level = 1;
+            let lastAnswer = -1;
+            let sameAnswerCount = 0;
+            let winCount = 0;
+            let maxLevel = 50;
 
-using namespace std;
+            function playLevel() {
+                if (level > maxLevel) {
+                    alert("你已通過所有關卡！恭喜！");
+                    return;
+                }
 
-int main() {
-    srand(time(NULL)); // 初始化亂數種子
+                let answer = Math.floor(Math.random() * 2);
+                let guess = prompt("第" + level + "關: 請輸入0或1");
 
-    cout << "歡迎參加魷魚遊戲!這是數位版的玻璃橋遊戲。接下來將會沒有任何提示，你只能選0或1，你能夠活到第幾關呢?來挑戰看看吧!據說通過的能實現一個願望!\n\n";
+                if (guess !== "0" && guess !== "1") {
+                    alert("輸入錯誤，請輸入0或1。");
+                    playLevel();
+                    return;
+                }
 
-    int level = 1;
-    int last_answer = -1;
-    int same_answer_count = 0;
-    int win_count = 0;
+                if (parseInt(guess) === answer) {
+                    alert("恭喜你通過第" + level + "關!");
+                    sameAnswerCount = 0;
+                    winCount++;
 
-    while (level <= 50) {
-        cout << "第" << level << "關: ";
-        int answer = rand() % 2; // 產生隨機答案
+                    if (winCount % 5 === 0 && level < maxLevel) {
+                        alert("恭喜你已經過了" + level + "關了。");
+                    }
 
-        int guess;
-        cin >> guess;
+                    level++;
+                    lastAnswer = answer;
 
-        if (guess != 0 && guess != 1) {
-            cout << "輸入錯誤，請輸入0或1。\n\n";
-            continue;
-        }
+                    if (level === 10) {
+                        alert("雖然你還沒達到能達成的願望，但你已經獲得心態崩潰免疫了，此buff能祝福你接下來更容易通關。");
+                    }
 
-        if (guess == answer) {
-            cout << "恭喜你通過第" << level << "關!\n\n";
-            same_answer_count = 0;
-            win_count++;
+                    playLevel();
+                } else {
+                    if (parseInt(guess) === lastAnswer && sameAnswerCount === 2) {
+                        alert("你以為答案都會是一樣的嗎");
+                        sameAnswerCount = 0;
+                    } else {
+                        alert("你輸了");
+                        sameAnswerCount++;
+                    }
 
-            if (win_count % 5 == 0 && level < 50) {
-                cout << "恭喜你已經過了" << level << "關了。\n\n";
+                    alert("你共通過了" + (level - 1) + "關。");
+                    if (confirm("是否要再玩一次?")) {
+                        level = 1;
+                        lastAnswer = -1;
+                        sameAnswerCount = 0;
+                        winCount = 0;
+                        playLevel();
+                    }
+                }
             }
 
-            level++;
-        } else {
-            if (guess == last_answer && same_answer_count == 2) {
-                cout << "你以為答案都會是一樣的嗎\n\n";
-                same_answer_count = 0;
-            } else {
-                cout << "你輸了\n\n";
-                same_answer_count++;
-            }
-
-            cout << "你共通過了" << level - 1 << "關。\n";
-            cout << "是否要再玩一次? (輸入0退出，輸入1再玩一次) ";
-            int play_again;
-            cin >> play_again;
-            if (play_again == 0) {
-                break;
-            } else {
-                level = 1;
-                last_answer = -1;
-                same_answer_count = 0;
-                win_count = 0;
-                cout << "\n\n";
-            }
+            playLevel();
         }
-
-        last_answer = answer;
-
-        if (level == 10) {
-            cout << "雖然你還沒達到能達成的願望，但你已經獲得心態崩潰免疫了，此buff能祝福你接下來更容易通關。\n\n";
-        }
-    }
-
-    if (level > 50)
+    </script>
+</head>
+<body>
+    <h1>歡迎參加魷魚遊戲!</h1>
+    <p>這是數位版的玻璃橋遊戲。接下來將會沒有任何提示，你只能選0或1，你能夠活到第幾關呢?來挑戰看看吧!據說通過的能實現一個願望!</p>
+    <button onclick="startGame()">開始遊戲</button>
+</body>
+</html>
