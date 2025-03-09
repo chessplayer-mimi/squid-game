@@ -39,10 +39,9 @@
         }
     </style>
 </head>
-<body>
+<body onload="startGame()">
     <h1>歡迎參加魷魚遊戲!</h1>
     <p>這是數位版的玻璃橋遊戲。選擇左邊或右邊，看看你能活到第幾關!</p>
-    
     <div class="game-container" id="game"></div>
     <div class="button-container" id="choice-buttons" style="display: none;">
         <button class="choice-button" onclick="makeChoice(0)">左邊</button>
@@ -62,6 +61,20 @@
             document.getElementById("choice-buttons").style.display = "flex";
         }
 
+        function showMilestoneMessage() {
+            const messages = {
+                5: "你已成功踏上第五塊玻璃，開始感受到腳底的顫抖了嗎？",
+                10: "雖然你還沒能許願，但你獲得了【心態崩潰免疫】Buff，讓你更容易走下去！",
+                20: "傳說這裡有隱藏的捷徑……但沒人知道它在哪裡。繼續走吧！",
+                30: "現在回頭看看……你已經超越了大部分挑戰者！你能挺到最後嗎？",
+                40: "玻璃已經開始顫抖，你的決策將決定你的生死！",
+                50: "恭喜你！你成功活過了所有關卡，傳說中的願望將為你實現！"
+            };
+            if (messages[level]) {
+                alert(messages[level]);
+            }
+        }
+
         function makeChoice(guess) {
             let answer = Math.floor(Math.random() * 2);
 
@@ -70,29 +83,10 @@
                 sameAnswerCount = 0;
                 winCount++;
                 
-                if (winCount % 5 === 0 && level < maxLevel) {
-                    alert("恭喜你已經過了" + level + "關了。");
-                }
+                showMilestoneMessage();
 
                 level++;
                 lastAnswer = answer;
-
-                if (level === 5) {
-                    alert("你已成功踏上第五塊玻璃，開始感受到腳底的顫抖了嗎？");
-                }
-                if (level === 10) {
-                    alert("雖然你還沒達到能達成的願望，但你已經獲得心態崩潰免疫了，此buff能祝福你接下來更容易通關。");
-                }
-                if (level === 20) {
-                    alert("傳說這裡有隱藏的捷徑……但沒人知道它在哪裡。繼續走吧！");
-                }
-                if (level === 30) {
-                    alert("現在回頭看看……你已經超越了大部分挑戰者！你能挺到最後嗎？");
-                }
-                if (level === 40) {
-                    alert("玻璃已經開始顫抖，你的決策將決定你的生死！");
-                }
-
 
                 if (level > maxLevel) {
                     alert("你已通過所有關卡！恭喜！");
@@ -104,10 +98,9 @@
                     alert("你以為答案都會是一樣的嗎");
                     sameAnswerCount = 0;
                 } else {
-                    alert("已經死亡，請使用轉生大卡車重新開始遊戲");
+                    alert("你已經死亡，請使用轉生大卡車");
                     sameAnswerCount++;
                 }
-                
                 alert("你共通過了" + (level - 1) + "關。");
                 document.getElementById("choice-buttons").style.display = "none";
                 if (confirm("是否使用轉生大卡車?")) {
