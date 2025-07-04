@@ -100,7 +100,7 @@
         window.loadLeaderboard = async function () {
             const q = query(collection(db, "rankings"), orderBy("score", "desc"), limit(5));
             const querySnapshot = await getDocs(q);
-            
+            let html = "<h2>🏆 排行榜</h2><ol>";
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 html += `<li>${data.name} - ${data.score} 關</li>`;
