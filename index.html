@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>魷魚遊戲 - 數位版玻璃橋遊戲</title>
     <style>
         body {
@@ -37,20 +37,82 @@
         .choice-button:hover {
             background-color: #e84118;
         }
+        #leaderboard {
+            margin-top: 40px;
+            text-align: center;
+        }
     </style>
 </head>
 <body onload="startGame()">
     <h1>歡迎參加魷魚遊戲!</h1>
     <p>這是數位版的玻璃橋遊戲。選擇左邊或右邊，看看你能活到第幾關!</p>
+
+    <div>
+        <label for="playerName">你的名字：</label>
+        <input type="text" id="playerName" placeholder="匿名玩家" />
+    </div>
+
     <div class="game-container" id="game"></div>
     <div class="button-container" id="choice-buttons" style="display: none;">
         <button class="choice-button" onclick="makeChoice(0)">左邊</button>
         <button class="choice-button" onclick="makeChoice(1)">右邊</button>
     </div>
-    
+
+    <div id="leaderboard"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            query,
+            orderBy,
+            limit,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+       const firebaseConfig = {
+  apiKey: "AIzaSyD-0-oZnldrV2YARljTym-0QA1AYPhPusA",
+  authDomain: "squid-game-c23c0.firebaseapp.com",
+  projectId: "squid-game-c23c0",
+  storageBucket: "squid-game-c23c0.firebasestorage.app",
+  messagingSenderId: "301331400116",
+  appId: "1:301331400116:web:d399d4b8bf6057f2931ee1",
+  measurementId: "G-H13J6BPBF7"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.saveScore = async function(name, score) {
+            try {
+                await addDoc(collection(db, "rankings"), {
+                    name: name || "匿名玩家",
+                    score: score,
+                    timestamp: Date.now()
+                });
+            } catch (e) {
+                console.error("儲存分數錯誤：", e);
+            }
+        };
+
+        window.loadLeaderboard = async function () {
+            const q = query(collection(db, "rankings"), orderBy("score", "desc"), limit(5));
+            const querySnapshot = await getDocs(q);
+            let html = "<h2>🏆 排行榜（前5名）</h2><ol>";
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                html += `<li>${data.name} - ${data.score} 關</li>`;
+            });
+            html += "</ol>";
+            document.getElementById("leaderboard").innerHTML = html;
+        };
+    </script>
+
     <script>
         let level, lastAnswer, sameAnswerCount, winCount, maxLevel;
-        
+
         function startGame() {
             level = 1;
             lastAnswer = -1;
@@ -59,6 +121,7 @@
             maxLevel = 50;
             document.getElementById("game").innerHTML = "<p>請選擇左邊或右邊:</p>";
             document.getElementById("choice-buttons").style.display = "flex";
+            loadLeaderboard();
         }
 
         function showMilestoneMessage() {
@@ -82,7 +145,7 @@
                 alert("恭喜你通過第" + level + "關!");
                 sameAnswerCount = 0;
                 winCount++;
-                
+
                 showMilestoneMessage();
 
                 level++;
@@ -101,6 +164,11 @@
                     alert("你已經死亡，請使用轉生大卡車");
                     sameAnswerCount++;
                 }
+
+                const name = document.getElementById("playerName").value;
+                saveScore(name, level - 1);
+                loadLeaderboard();
+
                 alert("你共通過了" + (level - 1) + "關。");
                 document.getElementById("choice-buttons").style.display = "none";
                 if (confirm("是否使用轉生大卡車?")) {
